@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, DragEvent } from 'react';
+import { Share2, Globe2, Sparkles, ChevronRight } from 'lucide-react';
 
 interface VoidInputProps {
   onSubmit: (input: string, targetLang: string) => void;
@@ -17,7 +18,6 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
   const [url, setUrl] = useState('');
   const [targetLang, setTargetLang] = useState('fr');
   const [isDragging, setIsDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     if (url.trim() && !disabled) {
@@ -29,122 +29,106 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
     if (e.key === 'Enter') handleSubmit();
   };
 
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault();
-    if (!disabled) setIsDragging(true);
-  };
-
-  const handleDragLeave = () => setIsDragging(false);
-
-  const handleDrop = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (disabled) return;
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      onSubmit(`[file] ${files[0].name}`, targetLang);
-    }
-  };
-
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto z-10">
       <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDragOver={(e) => { e.preventDefault(); if (!disabled) setIsDragging(true); }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          if (disabled) return;
+          const files = e.dataTransfer.files;
+          if (files.length > 0) onSubmit(`[file] ${files[0].name}`, targetLang);
+        }}
         className={`
-          relative rounded-2xl border-2 border-dashed p-8 transition-all duration-500
-          ${isDragging
-            ? 'border-orange-500/60 bg-orange-500/5 scale-[1.02]'
-            : disabled
-              ? 'border-zinc-800/30 bg-[#0c0c14]/50'
-              : 'border-orange-500/20 bg-[#0c0c14] hover:border-orange-500/40 void-glow'
-          }
+          relative rounded-3xl border transition-all duration-700 p-1
+          ${disabled ? 'opacity-60 grayscale-[0.5]' : ''}
+          ${isDragging ? 'border-orange-500 bg-orange-500/5 scale-[1.01]' : 'border-zinc-800/50 bg-zinc-950/20'}
         `}
       >
-        {/* Ambient corner accents */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-orange-500/30 rounded-tl-2xl" />
-        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-orange-500/30 rounded-tr-2xl" />
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-orange-500/30 rounded-bl-2xl" />
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-orange-500/30 rounded-br-2xl" />
-
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 agent-active" />
-            <span className="text-[10px] uppercase tracking-[0.15em] text-orange-400/80 font-medium">
-              Drop Node Active
-            </span>
+        <div className={`
+          rounded-[22px] p-8 md:p-10 transition-all duration-500
+          ${disabled ? 'bg-transparent' : 'bg-zinc-950/40 obsidian-card void-input-glow'}
+        `}>
+          {/* Status Badge */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-md">
+              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 agent-active-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-orange-400/90">
+                Awaiting Command
+              </span>
+            </div>
           </div>
-          <p className="text-zinc-400 text-sm">
-            Paste YouTube/Spotify URL or Drop Audio File
-          </p>
-        </div>
 
-        <div className="flex gap-3 mb-6">
-          <input
-            ref={inputRef}
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={disabled}
-            placeholder="https://youtube.com/watch?v=... or spotify:track:..."
-            className="
-              flex-1 bg-[#0a0a0f] border border-zinc-800 rounded-lg px-4 py-3
-              text-sm text-zinc-200 placeholder:text-zinc-600
-              focus:outline-none focus:border-orange-500/40 focus:ring-1 focus:ring-orange-500/20
-              disabled:opacity-40 disabled:cursor-not-allowed
-              transition-all duration-300
-            "
-          />
-          <button
-            onClick={handleSubmit}
-            disabled={disabled || !url.trim()}
-            className="
-              px-6 py-3 rounded-lg font-medium text-sm
-              bg-orange-500/10 border border-orange-500/30 text-orange-400
-              hover:bg-orange-500/20 hover:border-orange-500/50
-              disabled:opacity-30 disabled:cursor-not-allowed
-              transition-all duration-300
-            "
-          >
-            {disabled ? 'Processing...' : 'Process'}
-          </button>
-        </div>
-
-        {/* Language Vector Selection */}
-        <div className="flex flex-col items-center">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 font-mono">
-            Target Language Vector
-          </div>
-          <div className="flex gap-2 p-1 bg-zinc-900/50 border border-zinc-800 rounded-xl">
-            {LANGUAGES.map((lang) => (
+          {/* Input Section */}
+          <div className="relative group mb-8">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={disabled}
+              placeholder="Paste YouTube, Spotify, or drag audio..."
+              className="
+                w-full bg-black/40 border border-zinc-800/50 rounded-2xl px-6 py-5 pr-32
+                text-base text-zinc-100 placeholder:text-zinc-600 font-light
+                focus:outline-none focus:border-orange-500/30 focus:ring-1 focus:ring-orange-500/10
+                transition-all duration-500 backdrop-blur-xl
+              "
+            />
+            <div className="absolute right-2 top-2 bottom-2">
               <button
-                key={lang.code}
-                onClick={() => setTargetLang(lang.code)}
-                disabled={disabled}
-                className={`
-                  flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-300
-                  ${targetLang === lang.code
-                    ? 'bg-orange-500/20 border border-orange-500/40 text-orange-400'
-                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 border border-transparent'
-                  }
-                  disabled:opacity-40
-                `}
+                onClick={handleSubmit}
+                disabled={disabled || !url.trim()}
+                className="
+                  h-full px-6 rounded-xl font-bold text-xs uppercase tracking-widest
+                  bg-gradient-to-br from-orange-500 to-orange-600 text-white
+                  hover:shadow-[0_0_20px_-5px_rgba(249,115,22,0.5)]
+                  disabled:opacity-20 disabled:grayscale transition-all duration-300
+                  flex items-center gap-2
+                "
               >
-                <span>{lang.flag}</span>
-                <span>{lang.code.toUpperCase()}</span>
+                {disabled ? 'Swarms active' : 'Process'}
+                <ChevronRight size={14} className={disabled ? 'hidden' : ''} />
               </button>
-            ))}
+            </div>
+          </div>
+
+          {/* Language Selection */}
+          <div className="flex flex-col items-center">
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-5 font-mono">
+              <Globe2 size={10} />
+              Target Language Vector
+            </div>
+            <div className="inline-flex p-1.5 bg-black/40 border border-zinc-800/50 rounded-2xl backdrop-blur-2xl">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setTargetLang(lang.code)}
+                  disabled={disabled}
+                  className={`
+                    flex items-center gap-3 px-6 py-2.5 rounded-xl text-xs font-semibold transition-all duration-500
+                    ${targetLang === lang.code
+                      ? 'bg-zinc-800 text-orange-400 border border-zinc-700 shadow-xl'
+                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 border border-transparent'
+                    }
+                    disabled:opacity-30
+                  `}
+                >
+                  <span className="text-sm opacity-80">{lang.flag}</span>
+                  <span className="tracking-widest">{lang.code.toUpperCase()}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {isDragging && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-[#0a0a0f]/90 backdrop-blur-sm">
-            <div className="text-center">
-              <div className="text-3xl mb-2">🎵</div>
-              <p className="text-orange-400 text-sm font-medium">Drop audio file here</p>
+          <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-black/80 backdrop-blur-md z-20 border-2 border-orange-500/50">
+            <div className="text-center animate-bounce">
+              <Sparkles className="text-orange-500 w-12 h-12 mx-auto mb-4" />
+              <p className="text-white text-lg font-medium tracking-tight">Drop into the Void</p>
             </div>
           </div>
         )}
