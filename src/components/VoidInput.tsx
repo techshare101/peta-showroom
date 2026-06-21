@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, DragEvent } from 'react';
-import { Share2, Globe2, Sparkles, ChevronRight } from 'lucide-react';
+import { Globe2, ChevronRight, Activity } from 'lucide-react';
 
 interface VoidInputProps {
   onSubmit: (input: string, targetLang: string) => void;
@@ -25,12 +25,8 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSubmit();
-  };
-
   return (
-    <div className="w-full max-w-2xl mx-auto z-10">
+    <div className="w-full max-w-2xl mx-auto px-4">
       <div
         onDragOver={(e) => { e.preventDefault(); if (!disabled) setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
@@ -42,95 +38,78 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
           if (files.length > 0) onSubmit(`[file] ${files[0].name}`, targetLang);
         }}
         className={`
-          relative rounded-3xl border transition-all duration-700 p-1
-          ${disabled ? 'opacity-60 grayscale-[0.5]' : ''}
-          ${isDragging ? 'border-orange-500 bg-orange-500/5 scale-[1.01]' : 'border-zinc-800/50 bg-zinc-950/20'}
+          relative rounded-[2rem] tactical-border p-8 md:p-12 transition-all duration-700
+          ${isDragging ? 'border-orange-500 scale-[1.02] bg-orange-500/5' : 'bg-black/40'}
+          ${disabled ? 'opacity-50' : ''}
         `}
       >
-        <div className={`
-          rounded-[22px] p-8 md:p-10 transition-all duration-500
-          ${disabled ? 'bg-transparent' : 'bg-zinc-950/40 obsidian-card void-input-glow'}
-        `}>
-          {/* Status Badge */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-md">
-              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 agent-active-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-orange-400/90">
-                Awaiting Command
-              </span>
-            </div>
-          </div>
+        {/* Status indicator */}
+        <div className="flex justify-center mb-8">
+           <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800">
+             <div className="w-2 h-2 rounded-full bg-orange-500 agent-pulse" />
+             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500/80">Drop Node Active</span>
+           </div>
+        </div>
 
-          {/* Input Section */}
-          <div className="relative group mb-8">
-            <input
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={disabled}
-              placeholder="Paste YouTube, Spotify, or drag audio..."
-              className="
-                w-full bg-black/40 border border-zinc-800/50 rounded-2xl px-6 py-5 pr-32
-                text-base text-zinc-100 placeholder:text-zinc-600 font-light
-                focus:outline-none focus:border-orange-500/30 focus:ring-1 focus:ring-orange-500/10
-                transition-all duration-500 backdrop-blur-xl
-              "
-            />
-            <div className="absolute right-2 top-2 bottom-2">
+        <div className="text-center mb-8">
+           <p className="text-zinc-400 text-sm font-light">Paste YouTube/Spotify URL or Drop Audio File</p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 mb-10">
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            disabled={disabled}
+            placeholder="https://youtube.com/shorts/..."
+            className="
+              flex-1 bg-zinc-950 border border-zinc-800 rounded-2xl px-6 py-4
+              text-zinc-200 placeholder:text-zinc-700 focus:outline-none focus:border-orange-500/40
+              transition-all duration-300
+            "
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={disabled || !url.trim()}
+            className="
+              px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest
+              bg-orange-600 text-white hover:bg-orange-500 transition-all
+              disabled:opacity-20 shadow-xl shadow-orange-900/20
+            "
+          >
+            {disabled ? 'Processing' : 'Process'}
+          </button>
+        </div>
+
+        {/* Language Selection - Tactile Chips */}
+        <div className="flex flex-col items-center">
+          <div className="text-[9px] uppercase tracking-[0.4em] text-zinc-600 mb-4 font-bold">Target Language Vector</div>
+          <div className="flex gap-3">
+            {LANGUAGES.map((lang) => (
               <button
-                onClick={handleSubmit}
-                disabled={disabled || !url.trim()}
-                className="
-                  h-full px-6 rounded-xl font-bold text-xs uppercase tracking-widest
-                  bg-gradient-to-br from-orange-500 to-orange-600 text-white
-                  hover:shadow-[0_0_20px_-5px_rgba(249,115,22,0.5)]
-                  disabled:opacity-20 disabled:grayscale transition-all duration-300
-                  flex items-center gap-2
-                "
+                key={lang.code}
+                onClick={() => setTargetLang(lang.code)}
+                disabled={disabled}
+                className={`
+                  flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest transition-all duration-300
+                  ${targetLang === lang.code 
+                    ? 'bg-zinc-100 text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]' 
+                    : 'bg-zinc-900 text-zinc-500 hover:text-zinc-300 border border-zinc-800'
+                  }
+                `}
               >
-                {disabled ? 'Swarms active' : 'Process'}
-                <ChevronRight size={14} className={disabled ? 'hidden' : ''} />
+                <span>{lang.flag}</span>
+                {lang.code.toUpperCase()}
               </button>
-            </div>
-          </div>
-
-          {/* Language Selection */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-5 font-mono">
-              <Globe2 size={10} />
-              Target Language Vector
-            </div>
-            <div className="inline-flex p-1.5 bg-black/40 border border-zinc-800/50 rounded-2xl backdrop-blur-2xl">
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => setTargetLang(lang.code)}
-                  disabled={disabled}
-                  className={`
-                    flex items-center gap-3 px-6 py-2.5 rounded-xl text-xs font-semibold transition-all duration-500
-                    ${targetLang === lang.code
-                      ? 'bg-zinc-800 text-orange-400 border border-zinc-700 shadow-xl'
-                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 border border-transparent'
-                    }
-                    disabled:opacity-30
-                  `}
-                >
-                  <span className="text-sm opacity-80">{lang.flag}</span>
-                  <span className="tracking-widest">{lang.code.toUpperCase()}</span>
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
         {isDragging && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-black/80 backdrop-blur-md z-20 border-2 border-orange-500/50">
-            <div className="text-center animate-bounce">
-              <Sparkles className="text-orange-500 w-12 h-12 mx-auto mb-4" />
-              <p className="text-white text-lg font-medium tracking-tight">Drop into the Void</p>
-            </div>
-          </div>
+           <div className="absolute inset-0 rounded-[2rem] bg-orange-600/90 flex items-center justify-center backdrop-blur-sm z-50">
+             <Activity size={48} className="text-white animate-pulse" />
+           </div>
         )}
       </div>
     </div>
