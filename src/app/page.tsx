@@ -73,8 +73,12 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-zinc-800/50 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <span className="text-[10px] text-zinc-600 font-mono">PETA v0.1.1 — SHOWROOM</span>
-          <span className="text-[10px] text-zinc-600">Powered by Eve Agent Framework</span>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] text-zinc-600 font-mono tracking-wider">PETA v0.1.2 — SHOWROOM</span>
+            <div className="h-3 w-[1px] bg-zinc-800" />
+            <span className="text-[10px] text-zinc-500 font-bold tracking-[0.2em] uppercase">MetalMindTech</span>
+          </div>
+          <span className="text-[10px] text-zinc-700">© 2026 Powered by Eve Agent Framework</span>
         </div>
       </footer>
     </main>
