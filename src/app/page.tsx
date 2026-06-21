@@ -13,16 +13,16 @@ import {
 export default function Home() {
   const [pipeline, setPipeline] = useState<PipelineState>(getInitialPipelineState());
 
-  const handleProcess = useCallback((input: string) => {
+  const handleProcess = useCallback((input: string, targetLang: string) => {
     setPipeline(getInitialPipelineState());
 
     simulatePipeline((newState) => {
       setPipeline({ ...newState });
-    }, input);
+    }, input, targetLang);
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col bg-[#0a0a0f] text-zinc-100">
       {/* Header */}
       <header className="border-b border-zinc-800/50 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -31,7 +31,7 @@ export default function Home() {
               <span className="text-orange-400 text-sm font-bold">P</span>
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-zinc-100 tracking-wide">PETA</h1>
+              <h1 className="text-sm font-semibold tracking-wide">PETA</h1>
               <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Universal Voice Layer</p>
             </div>
           </div>
@@ -51,7 +51,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-light text-zinc-100 mb-3 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-light mb-3 tracking-tight">
             The <span className="text-orange-400 font-medium">Void</span> Awaits
           </h2>
           <p className="text-zinc-500 text-sm max-w-md mx-auto leading-relaxed">
@@ -73,7 +73,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-zinc-800/50 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <span className="text-[10px] text-zinc-600 font-mono">PETA v0.1.0 — SHOWROOM</span>
+          <span className="text-[10px] text-zinc-600 font-mono">PETA v0.1.1 — SHOWROOM</span>
           <span className="text-[10px] text-zinc-600">Powered by Eve Agent Framework</span>
         </div>
       </footer>

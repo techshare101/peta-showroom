@@ -18,10 +18,17 @@ export interface PipelineState {
   agents: AgentState[];
   isProcessing: boolean;
   inputUrl: string;
+  targetLang: string;
   outputReady: boolean;
 }
 
 export const STAGES = ['Analyze', 'Isolate', 'Transmute', 'Mix'] as const;
+
+const LANG_LABELS: Record<string, string> = {
+  en: 'English',
+  fr: 'French',
+  sp: 'Spanish',
+};
 
 export const INITIAL_AGENTS: AgentState[] = [
   {
@@ -65,21 +72,27 @@ export function getInitialPipelineState(): PipelineState {
     agents: INITIAL_AGENTS.map(a => ({ ...a })),
     isProcessing: false,
     inputUrl: '',
+    targetLang: 'fr',
     outputReady: false,
   };
 }
 
 // Simulated processing durations per stage (ms)
-const STAGE_DURATIONS = [2500, 3500, 4000, 3000];
+const STAGE_DURATIONS = [2500, 3500, 5000, 3000];
 
 export function simulatePipeline(
   onUpdate: (state: PipelineState) => void,
-  inputUrl: string
+  inputUrl: string,
+  targetLang: string = 'fr'
 ): () => void {
   let cancelled = false;
   const state = getInitialPipelineState();
   state.inputUrl = inputUrl;
+  state.targetLang = targetLang;
   state.isProcessing = true;
+
+  // Update Poet Agent description to show target language
+  state.agents[2].description = `Translating lyrics to ${LANG_LABELS[targetLang]}...`;
 
   async function run() {
     for (let i = 0; i < 4; i++) {
@@ -91,7 +104,7 @@ export function simulatePipeline(
       onUpdate({ ...state, agents: state.agents.map(a => ({ ...a })) });
 
       const duration = STAGE_DURATIONS[i];
-      const steps = 20;
+      const steps = 25;
       const stepDuration = duration / steps;
 
       for (let step = 0; step <= steps; step++) {

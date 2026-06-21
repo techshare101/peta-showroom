@@ -3,18 +3,25 @@
 import { useState, useRef, DragEvent } from 'react';
 
 interface VoidInputProps {
-  onSubmit: (input: string) => void;
+  onSubmit: (input: string, targetLang: string) => void;
   disabled: boolean;
 }
 
+const LANGUAGES = [
+  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'fr', label: 'French', flag: '🇫🇷' },
+  { code: 'sp', label: 'Spanish', flag: '🇪🇸' },
+];
+
 export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
   const [url, setUrl] = useState('');
+  const [targetLang, setTargetLang] = useState('fr');
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     if (url.trim() && !disabled) {
-      onSubmit(url.trim());
+      onSubmit(url.trim(), targetLang);
     }
   };
 
@@ -36,7 +43,7 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
 
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      onSubmit(`[file] ${files[0].name}`);
+      onSubmit(`[file] ${files[0].name}`, targetLang);
     }
   };
 
@@ -74,7 +81,7 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 mb-6">
           <input
             ref={inputRef}
             type="text"
@@ -104,6 +111,33 @@ export default function VoidInput({ onSubmit, disabled }: VoidInputProps) {
           >
             {disabled ? 'Processing...' : 'Process'}
           </button>
+        </div>
+
+        {/* Language Vector Selection */}
+        <div className="flex flex-col items-center">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 font-mono">
+            Target Language Vector
+          </div>
+          <div className="flex gap-2 p-1 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => setTargetLang(lang.code)}
+                disabled={disabled}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-300
+                  ${targetLang === lang.code
+                    ? 'bg-orange-500/20 border border-orange-500/40 text-orange-400'
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 border border-transparent'
+                  }
+                  disabled:opacity-40
+                `}
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.code.toUpperCase()}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {isDragging && (
