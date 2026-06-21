@@ -2,42 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    background-color: #05050a;
-    color: #ffffff;
-    -webkit-font-smoothing: antialiased;
-  }
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 10, 10, 15;
+  --background-end-rgb: 10, 10, 15;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: #0a0a0f;
+  -webkit-font-smoothing: antialiased;
 }
 
 @layer components {
-  .tactical-border {
-    border: 2px dashed rgba(249, 115, 22, 0.2);
-    box-shadow: inset 0 0 20px rgba(249, 115, 22, 0.05);
+  .void-glow {
+    box-shadow: 0 0 40px -10px rgba(249, 115, 22, 0.1);
   }
+  
+  .agent-active {
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
 
-  .tactical-border:hover {
-    border-color: rgba(249, 115, 22, 0.4);
-    box-shadow: inset 0 0 30px rgba(249, 115, 22, 0.1);
-  }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
 
-  .agent-pulse {
-    animation: agent-glow 2s ease-in-out infinite;
-  }
-
-  @keyframes agent-glow {
-    0%, 100% { opacity: 1; filter: drop-shadow(0 0 5px #f97316); }
-    50% { opacity: 0.5; filter: drop-shadow(0 0 2px #f97316); }
-  }
-
-  .shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
+* {
+  border-color: rgba(63, 63, 70, 0.3);
 }
